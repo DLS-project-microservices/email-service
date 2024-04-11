@@ -3,6 +3,7 @@ import client, { Connection, Channel, ConsumeMessage } from 'amqplib';
 import sendMail from './services/email.js';
 
 try {
+    console.log('Establishing connection to RabbitMQ...')
     const connection: Connection = await client.connect(`amqp://${process.env.AMQP_HOST}`);
 
     const channel: Channel = await connection.createChannel();
@@ -31,6 +32,8 @@ try {
             channel.ack(msg);
         }
     })
+
+    console.log(`Connection to RabbitMQ exchange "${exchange}" established.`)
 }
 catch(error) {
     console.log(error);
