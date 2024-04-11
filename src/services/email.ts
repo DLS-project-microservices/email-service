@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import Email from '../types/Email';
+import Email from '../types/Email.js';
 
 const transporter = nodemailer.createTransport({
     service: 'Gmail',
@@ -24,7 +24,7 @@ export default async function sendMail(email: Email): Promise<void> {
             console.log(error);
         }
         else {
-            console.log(`Email send: ${info.response}`);
+            console.log(`\nEmail sent to ${email.to} \nResponse: ${info.response}\n`);
         }
     })
 }
