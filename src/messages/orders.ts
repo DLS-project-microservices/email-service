@@ -22,20 +22,28 @@ async function consumeOrderStarted(handlerFunction: (email: Email) => Promise<vo
             if(msg?.content) {
                 const message = JSON.parse(msg.content.toString());
                 console.log(message);
+
+                // productDefailts and joinedString is just an example to test it
+                const productDetails = message.orderLineItems.map((item: any) => {
+                    return `ID: ${item.productId}, Quantity: ${item.quantity}, Total price: ${item.totalPrice}`
+                })
+
+                const joinedString = `Order Number: ${message.orderNumber}\n${productDetails.join('\n')}\nTotal Price: ${message.totalPrice}`
+                
                 await handlerFunction({
                     to: message.customer.email,
                     content: {
+                        // TODO: find out how the email should look like.
                             subject: `Thanks for the order, ${message.customer.firstName}!`,
-                            text: `Thanks for ordering stuff, ${message.customer.firstName}.`
+                            text: joinedString
                         }
                     })
-            
+                
                 channel.ack(msg);
             }
         }, { 
             noAck: false 
         })
-    
         console.log(`Connection to RabbitMQ exchange "${exchange}" established. \nListening for "order started" events...`)
     }
     catch(error) {
