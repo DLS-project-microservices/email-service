@@ -2,7 +2,7 @@ import { Channel, ConsumeMessage } from 'amqplib';
 import connectToRabbitMQ from './connection.js';
 import Email from '../types/Email.js';
 
-const exchange = 'order';
+const exchange = 'order_fanout';
 const queueName  = 'email_service_order';
 
 async function consumeOrderStarted(handlerFunction: (email: Email) => Promise<void>) {
@@ -12,7 +12,7 @@ async function consumeOrderStarted(handlerFunction: (email: Email) => Promise<vo
         await channel.assertExchange(exchange, 'fanout', {
             durable: true
         })
-    
+
         await channel.assertQueue(queueName, {
             durable: true,
         });
@@ -29,27 +29,27 @@ async function consumeOrderStarted(handlerFunction: (email: Email) => Promise<vo
                 })
 
                 const joinedString = `Order Number: ${message.orderNumber}\n${productDetails.join('\n')}\nTotal Price: ${message.totalPrice}`
-                
+
                 await handlerFunction({
                     to: message.customer.email,
                     content: {
                         // TODO: find out how the email should look like.
-                            subject: `Thanks for the order, ${message.customer.firstName}!`,
-                            text: joinedString
-                        }
-                    })
-                
+                        subject: `Thanks for the order, ${message.customer.firstName}!`,
+                        text: joinedString
+                    }
+                })
+
                 channel.ack(msg);
             }
-        }, { 
-            noAck: false 
+        }, {
+            noAck: false
         })
         console.log(`Connection to RabbitMQ exchange "${exchange}" established. \nListening for "order started" events...`)
     }
     catch(error) {
         console.log(error);
     }
-    
+
 }
 
 export {
