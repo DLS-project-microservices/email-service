@@ -5,15 +5,14 @@ import Email from '../types/Email.js';
 const exchange = 'order_fanout';
 const queueName  = 'email_service_consume_shipment_sent';
 
-async function consumeShipmentSent(): Promise<void> {
-    const queueName = "order_service_consume_shipment_sent";
+async function consumeShipmentSent(handlerFunction: (email: Email) => Promise<void>) {
     try {
         const channel: Channel = await connectToRabbitMQ();
 
         await channel.assertQueue(queueName, {
             durable: true
         });
-        channel.bindQueue(queueName, 'order_fanout', 'shipment sent');
+        channel.bindQueue(queueName, exchange, 'shipment sent');
 
         console.log('Waiting for shipment_sent events...');
 
@@ -22,6 +21,17 @@ async function consumeShipmentSent(): Promise<void> {
                 const messageContent = JSON.parse(msg.content.toString());
                 console.log(messageContent);
                 console.log('shipment_sent event processed successfully');
+
+                await handlerFunction({
+                    to: messageContent.customer.email,
+                    content: {
+                        subject: `Your order is on its way!`,
+                        text: `Hello ${messageContent.customer.firstName},\n\n
+                        This mail was sendt to you to confirm that order: ${messageContent.orderNumber} has been shipped.\n\n
+                        Best regards, DLS-Project Company\n`
+                    }
+                });
+
                 channel.ack(msg);
             }
         });

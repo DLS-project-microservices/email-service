@@ -11,7 +11,7 @@ async function consumeOrderStarted(handlerFunction: (email: Email) => Promise<vo
 
         await channel.assertExchange(exchange, 'fanout', {
             durable: true
-        })
+        });
 
         await channel.assertQueue(queueName, {
             durable: true,
@@ -26,7 +26,7 @@ async function consumeOrderStarted(handlerFunction: (email: Email) => Promise<vo
                 // productDefailts and joinedString is just an example to test it
                 const productDetails = message.orderLineItems.map((item: any) => {
                     return `ID: ${item.productId}, Quantity: ${item.quantity}, Total price: ${item.totalPrice}`
-                })
+                });
 
                 const joinedString = `Order Number: ${message.orderNumber}\n${productDetails.join('\n')}\nTotal Price: ${message.totalPrice}`
 
@@ -37,7 +37,7 @@ async function consumeOrderStarted(handlerFunction: (email: Email) => Promise<vo
                         subject: `Thanks for the order, ${message.customer.firstName}!`,
                         text: joinedString
                     }
-                })
+                });
 
                 channel.ack(msg);
             }
