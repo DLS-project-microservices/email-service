@@ -26,7 +26,7 @@ export default async function sendMail(email: Email): Promise<void> {
         else {
             console.log(`\nEmail sent to ${email.to} \nResponse: ${info.response}\n`);
         }
-    })
+    });
 }
 
 

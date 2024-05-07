@@ -2,7 +2,7 @@ import { Channel, ConsumeMessage } from 'amqplib';
 import connectToRabbitMQ from './connection.js';
 import Email from '../types/Email.js';
 
-const exchange = 'order_fanout';
+const exchange = 'shipment_fanout';
 const queueName  = 'email_service_consume_shipment_sent';
 
 async function consumeShipmentSent(handlerFunction: (email: Email) => Promise<void>) {
