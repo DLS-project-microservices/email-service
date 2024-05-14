@@ -5,8 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon --exec ts-node --esm src/index.ts",
-    "start20": "nodemon --exec node --loader ts-node/esm src/index.ts",
+    "start": "ts-node --esm src/index.ts",
+    "startdev20": "nodemon --exec node --loader ts-node/esm src/index.ts",
+    "startdev": "nodemon --exec ts-node --esm src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
