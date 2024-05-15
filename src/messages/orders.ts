@@ -1,14 +1,14 @@
 import { Channel, ConsumeMessage } from 'amqplib';
-import connectToRabbitMQ from './connection.js';
+import { connectToRabbitMQ } from 'amqplib-retry-wrapper-dls';
 import Email from '../types/Email.js';
 
 const exchange = 'order_fanout';
 const queueName  = 'email_service_order';
 
+const channel: Channel = await connectToRabbitMQ(process.env.AMQP_HOST);
+
 async function consumeOrderStarted(handlerFunction: (email: Email) => Promise<void>) {
     try {
-        const channel: Channel = await connectToRabbitMQ();
-
         await channel.assertExchange(exchange, 'fanout', {
             durable: true
         });
