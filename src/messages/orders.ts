@@ -5,6 +5,7 @@ import Email from '../types/Email.js';
 const exchange = 'order_fanout';
 const failExchange = 'order_direct';
 const queueName  = 'email_service_order';
+const failQueue = "email_service_order_failed"
 
 const channel: Channel = await connectToRabbitMQ(process.env.AMQP_HOST);
 
@@ -59,12 +60,12 @@ async function consumeOrderFailed(handlerFunction: (email: Email) => Promise<voi
             durable: true
         });
 
-        await channel.assertQueue(queueName, {
+        await channel.assertQueue(failQueue, {
             durable: true,
         });
         await channel.prefetch(1);
-        await channel.bindQueue(queueName, failExchange, '');
-        await channel.consume(queueName, async (msg: ConsumeMessage | null) => {
+        await channel.bindQueue(failQueue, failExchange, 'order failed');
+        await channel.consume(failQueue, async (msg: ConsumeMessage | null) => {
             if(msg?.content) {
                 const message = JSON.parse(msg.content.toString());
                 console.log(message);
